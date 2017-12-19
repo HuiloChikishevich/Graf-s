@@ -1,0 +1,67 @@
+#include <iostream>
+#include <cmath>
+#include <vector>
+
+using namespace std;
+
+void matrix (int **p, int **arr, int *cost, int v, int e) {
+    for (int i=0; i<v; i++) { 
+        for (int j=0; j<v; j++) {
+            p[i][j]=0;
+        }
+    }
+    for (int i=0; i<e; i++) {
+        p[arr[i][0]-1][arr[i][1]-1]=cost[i];
+        p[arr[i][1]-1][arr[i][0]-1]=cost[i];
+    }
+}
+
+void Warshall_Floyd (int v, int e, int **g, int *cost, int **p) {
+	for (int k=0; k<v; k++) {
+		for (int i=0; i<v; i++) {
+			for (int j=0; j<v; j++) {
+			    if (g[i][j]>g[i][k]+g[k][j]) {
+			        g[i][j]=g[i][k]+g[k][j];
+			        p[i][j]=p[i][k];
+			    }
+			}
+		}
+	}
+}
+
+void return_path (int v1, int v2, int **p, vector <int> path) {
+    path.push_back(v1);
+    v1=p[v1][v2];
+    return_path (v1, v2, p, path);
+}
+
+int main() {
+    int e,v; 
+    cin>>e>>v; //количество ребер и вершин
+    int v1, v2;
+    cin>>v1>>v2;
+    int **arr=new int* [e];
+    for (int i=0; i<e; i++) {
+        arr[i]=new int [2];
+    }
+    for (int i=0; i<e; i++) {
+        cin>>arr[i][0]>>arr[i][1];
+    }
+    int *cost=new int [e];
+    for (int i=0; i<e; i++) {
+        cin>>cost[i];
+    }
+    int **g=new int* [v]; 
+    for (int i=0; i<v; i++) {
+        g[i]=new int [v];
+    }
+    int **p=new int* [v]; 
+    for (int i=0; i<v; i++) {
+        p[i]=new int [v];
+    }
+    matrix (g, arr, cost, v, e);
+    Warshall_Floyd (v, e, arr, cost, p);
+    vector <int> path;
+    return_path (0, v-1, p, path);
+    return 0;
+}
